@@ -1,53 +1,50 @@
 class consoleactions{
 
+	static var hoverRGB:Array = new Array(58, 116, 190);
+	static var timeNeedToPressButton:Array = new Array(.1, .5, .8, 1, 1.35, 1.5);
+
 	static function init (){
 		if (_root.console == undefined)
 			_root.console = _root.attachMovie('console', 'console', 0);
 		
-		_root.console.mouseControlling = false;
-		_root.console.mouseControlTimer = 0;
-		
 		_root.console._x = 200; _root.console._y = 0;
 		
 		_root.console.items = new Array();
-		_root.console.activeElement = null;
-		
 		
 		_root.console.onMouseMove = function (){
-			this.mouseControlling = true;
-			this.mouseControlTimer = 3;
 		}
 		
 		_root.console.onEnterFrame = function (){
-			// switching to mouse controlling and back
-				if (this.mouseControlTimer <= 0)
-					this.mouseControlling = false;
-				else
-					this.mouseControlTimer -= fps.TimePassed;
-			// 
 		}
 		
-		_root.console.spawnGUIelement = function (guielementtype, X, Y, number, nam, action){
-			if (X == 'default') X = 100;
-			if (number == undefined) number = this.items.length + 1;
-			if (action == undefined) action = doNothing;
-			if (nam == undefined) nam = "GUI element " + number;
+		_root.console.pid = 0;
+		_root.console.spawnGUIelement = function (guielementtype, X, Y):MovieClip{
+			++this.pid;
+			var newGUI = this.attachMovie(guielementtype, guielementtype + '_' + this.pid, this.getNextHighestDepth());
+			newGUI._x = X; newGUI._y = Y; newGUI.gotoAndStop(1);
+			this.items.push(newGUI);
+			return newGUI;
+		}
+		
+		
+		_root.console.spawnButton = function (X, Y, wid, buttonName, buttonDescription, action, multiplePressingAvailable){
+		
+			if (X == 'default') X = 10;
+			if (Y == 'default') Y = 200;
+			if (wid == 'default') wid = 180;
+			if (multiplePressingAvailable == undefined) multiplePressingAvailable = false;
 			
-			var newGUI = this.attachMovie(guielementtype, guielementtype + '_' + number, this.getNextHighestDepth());
-			newGUI._x = X;
-			newGUI._y = Y;
-			newGUI.stop();
-			newGUI.gui_text = nam; newGUI.rewriteText();
-		}
-		
-		
-		_root.console.spawnButtons = function (names:Array, actions:Array){
-			for (var i = 0; i < names.length; ++i)
-				this.spawnGUIelement('console_button', 'default', 382.5 + 20*( i + 1 - names.length ), i, names[i], actions[i]);
+			var newButton = this.spawnGUIelement('console_button', X, Y);
+			newButton.itemName =  buttonName;
+			newButton.requiredWidth = wid; 
+			newButton.nedUpd = true;
+			newButton.action = action;
+			newButton.multiplePressingAvailable = multiplePressingAvailable;
 		}
 		
 		_root.console.spawnTest = function (){
-			this.spawnButtons(new Array('вариант первый', undefined, 'Готово'), new Array(doNothing, doNothing, doNothing));
+			for (var i = 0; i < 1; ++i)
+			this.spawnButton('default',50 + i * 17,'default','oka y ' + i,'this is just okay button', doNothing, true)					 
 		}
 	}
 	
