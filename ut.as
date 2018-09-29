@@ -12,7 +12,14 @@
 		}
 		
 		static function colorTo(who, r, g, b){
+			if (who.clr == undefined)
+				who.clr = new Color(who);
 			who.clr.setTransform({rb:r, gb:g, bb:b});
+		}
+		
+		static function colorToHover(who, k){
+			if (k == undefined) k = 1;
+			colorTo(who, consoleactions.hoverRGB[0] * k, consoleactions.hoverRGB[1] * k, consoleactions.hoverRGB[2] * k);
 		}
 		
 		static function slowChangeColorTo (who, change, timeInSec, timeInSecFinish, r, g, b, mult){
@@ -47,9 +54,10 @@
 				colorTo(who, who.cI * r, who.cI * g, who.cI * b);	
 			
 		}
-		static function slowChangeColorToHoverRGB(whos:Array, change, extra){
+		static function slowChangeColorToHoverRGB(whos:Array, change, extra, k){
+			if (k == undefined) k = 1;
 			for (var i = 0; i < whos.length; ++i)
-				slowChangeColorTo(whos[i], change, .15, .4, consoleactions.hoverRGB[0], consoleactions.hoverRGB[1], consoleactions.hoverRGB[2],
+				slowChangeColorTo(whos[i], change, .15, .4, consoleactions.hoverRGB[0] * k, consoleactions.hoverRGB[1] * k, consoleactions.hoverRGB[2] * k,
 				((extra)? 1.7 : 1));
 		
 		}
