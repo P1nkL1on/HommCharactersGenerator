@@ -60,15 +60,35 @@ class consoleactions{
 			newCheckBox.action = action;
 		}
 		
+		ActionConsole.spawnTrackBar = function (X, Y, wid, trackbarDescription, action, minValue, maxValue, stepValue, currentValues){
+			if (X == 'default') X = 10;
+			if (Y == 'default') Y = 200;
+			if (wid == 'default') wid = 180;
+			if (minValue == undefined) minValue = 0;
+			if (maxValue == undefined) maxValue = 1;
+			if (stepValue == undefined) stepValue = 1;
+			if (currentValues == undefined) currentValues = 0;
+			
+			var newTrackBar = this.spawnGUIelement('console_trackbar', X, Y);
+			newTrackBar.requiredWidth = wid; 
+			newTrackBar.requiredValueChange = action;
+			newTrackBar.requiredValues = new Array(minValue, maxValue, stepValue, currentValues);
+			newTrackBar.nedUpd = true;
+		}
+		
 		
 		
 		ActionConsole.spawnTest = function (){
-			for (var i = 0; i < 3; ++i)
+			for (var i = 0; i < 1; ++i)
 			this.spawnButton('default',50 + i * 17,'default','oka y ' + i,'this is just okay button', doNothing, random(2)==0)		
 
 
-			for (var i = 0; i < 7; ++i)
-			this.spawnCheckBox('default',101 + 12 * i,'default',' on '+i+'/ off','this is just okay checkbox', !random(2), doNothing2)				
+			for (var i = 0; i < 1; ++i)
+			this.spawnCheckBox('default',101 + 12 * i,'default',' on '+i+'/ off','this is just okay checkbox', !random(2), doNothing2)		
+
+
+			this.spawnTrackBar('default',151 + 12,'default', 'no', doNothing2, 20, 100, 10, 50);	
+			this.spawnTrackBar('default',151 + 36, 10, 'no', doNothing2);				
 		}
 	}
 	

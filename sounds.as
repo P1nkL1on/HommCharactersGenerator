@@ -16,7 +16,7 @@ class sounds
 	static function guiSounds():Array{
 	
 		var sName = new Array("btn");
-		var sCount = new Array(4, 0);
+		var sCount = new Array(6, 0);
 		var sEndCount = new Array('.mp3');
 		var sos:Array = new Array();
 		for (var i = 0; i < sName.length; i++){
