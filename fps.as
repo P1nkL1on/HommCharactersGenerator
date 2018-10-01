@@ -23,7 +23,7 @@ class fps{
 
 	static function startFPSCounting (){
 		if (_root.fpsC == undefined)
-			_root.fpsC = _root.attachMovie('fpsCounter', 'fpsC', -1);
+			_root.fpsC = _root.attachMovie('fpsCounter', 'fpsC', _root.getNextHighestDepth());
 		_root.fpsC.onEnterFrame = function (){
 			countDeltaTime();
 			this.info.text = currentFps;
