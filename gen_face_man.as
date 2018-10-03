@@ -115,22 +115,37 @@ class gen_face_man{
 		if (age < 55) return ((new Array('slim', 'norm', 'old', 'fat'))[random(4)]);
 		return ((new Array('slim', 'old', 'fat'))[random(3)]);
 	}
-	static function bodyHairTypeLeg(age, bodyHair):Number{
+	static function bodyHairTypeLeg(age, raceInd, bodyHair):Number{
+		var func = Math.min;
+		if (raceInd > 1) func = Math.max;
 		if (age <= 10) return 10;
-		if (age <= 16) return Math.min(bodyHair, 10 - random(5));
-		if (age <= 25) return Math.min(bodyHair, 10 - random(8));
-		return Math.min(bodyHair, 1 + random(8));
+		if (age <= 16) return func(bodyHair, 10 - random(5));
+		if (age <= 25) return func(bodyHair, 10 - random(8));
+		return func(bodyHair, 1 + random(8));
 	}
 	static function bodyHairTypeBody(age, raceInd):Number{
-		if (age <= 10) return 13 - random(3);
-		if (age <= 18) return 13 -  random(6);
-		if (age <= 50) return 1 + random(9);
-		return 10 - random(10);
+		var dif = 1;
+		if (raceInd > 1) dif = 2;
+		if (age <= 10) return 13 - Math.floor(random(3) / dif);
+		if (age <= 18) return 13 -  Math.floor(random(6) / dif);
+		if (age <= 50) return 9 - Math.floor(random(9) / dif);
+		return 10 - Math.floor(random(10) / dif);
 	}
-	static function bodyHairTypeAss(age, raceInd):Number{
+	static function bodyHairTypeAss(age):Number{
 		if (age <= 8) return 5;
 		if (age <= 15) return 4 - random(4);
 		return 1+random(2);
+	}
+	static function randomBodyHairColor (raceInd, hair2){
+		return ((random(2+raceInd)) && raceInd != 1 && !(!random(5) && hair2[0]>50))? hairRandomDarkColor() : 
+				hairColorDiff(hair2, -(5+random(15)));
+	}
+	static function randomHandType (bodyT):Number{
+		if (bodyT == 'kid') return 5;
+		if (bodyT == 'old') return (new Array(1,2,5))[random(3)];
+		if (bodyT == 'power') return 3+random(2);
+		if (bodyT == 'slim') return 2;
+		return 1+random(3);
 	}
 	
 	
@@ -157,13 +172,13 @@ class gen_face_man{
 		person.view_head_scaleY = 95+random(11);
 		person.view_head_eye_scale = 70 + random(51);
 		
-		person.view_hair_body_color = 
-			(random(4) && raceInd != 1)? hairRandomDarkColor() : 
-			hairColorDiff(person.view_hair2_color, -(5+random(15)));
+		person.view_hair_body_color = randomBodyHairColor(raceInd, person.view_hair2_color);
 		person.view_body_type = bodyType(age);
 		person.view_body_hair_body_type = bodyHairTypeBody(age, raceInd);
-		person.view_body_hair_ass_type = bodyHairTypeAss(age, raceInd);
-		person.view_body_hair_leg_type = bodyHairTypeLeg(age, person.view_body_hair_body_type);
+		person.view_body_hair_ass_type = bodyHairTypeAss(age);
+		person.view_body_hair_leg_type = bodyHairTypeLeg(age, raceInd, person.view_body_hair_body_type);
+		
+		person.view_hand_type = randomHandType(person.view_body_type);
 	}
 	
 	static function proectFace(person, head){
@@ -194,16 +209,30 @@ class gen_face_man{
 	
 	static function proectBody(person){
 		person.gotoAndStop(person.view_body_type);
+		//var invalid = random(3);if (random(3))while(--invalid > 0)person.nextFrame();
+		// hands
+		var hands:Array = new Array(person.hand_right, person.hand_left, person.hand_right2, person.hand_left2);
+		for (var i = 0; i < 4; ++i) if (hands[i] != undefined){
+			hands[i].gotoAndStop(person.view_hand_type);
+			ut.colorTo(hands[i].skin, person.view_skin_color);
+		}
+		
 		ut.colorTo(person.skin, person.view_skin_color);
-		for (var i = 0; i < 7; ++i){
+		for (var i = 0; i < 7 + 4; ++i){
 			var gotoFrame = person.view_body_hair_leg_type;
 			if (i == 1) gotoFrame = person.view_body_hair_ass_type;
 			if (i == 0) gotoFrame = person.view_body_hair_body_type;
 			
-			person['h'+bodyPartNames.charAt(i)].gotoAndStop(gotoFrame);
-			ut.colorTo(person['h'+bodyPartNames.charAt(i)], person.view_hair_body_color);
+			var hair_element = person['h'+bodyPartNames.charAt(i)];
+			if (i >= 7){ 
+				var hand = hands[Math.floor((i - 7)/2 + .1)];
+				hair_element = hand['h'+((i - 7) % 2 + 1)]; 
+				trace(hair_element)
+			}
+			hair_element.gotoAndStop(gotoFrame);
+			ut.colorTo(hair_element, person.view_hair_body_color);
 		}
-		person.info.text = person.age;
+		person.info.text = person.age+' '+person.raceInd;
 		person.cacheAsBitmap = true;
 	}
 	
