@@ -14,6 +14,9 @@
 		static function colorTo(who, r, g, b){
 			if (who.clr == undefined)
 				who.clr = new Color(who);
+			if (g == undefined && b == undefined){
+				g = r[1]; b = r[2]; r = r[0];
+			}
 			who.clr.setTransform({rb:r, gb:g, bb:b});
 		}
 		
@@ -50,8 +53,9 @@
 				who.needColorUpdate = true;
 				who.colorChangeTimerSec -= fps.TimePassed * (timeInSec / timeInSecFinish);
 			}
-			if (who.needColorUpdate)
-				colorTo(who, who.cI * r, who.cI * g, who.cI * b);	
+			if (who.needColorUpdate){
+				colorTo(who, who.cI * r, who.cI * g, who.cI * b);
+			}				
 			
 		}
 		static function slowChangeColorToHoverRGB(whos:Array, change, extra, k){
