@@ -70,6 +70,9 @@ class gen_face_man{
 		if (age < 52) return 12 + random(11);
 		return 14 + random(9);	
 	}
+	static function hairRandomDarkColor():Array{
+		return hr_clrsColor[random(3)];
+	}
 	static function hairRandomColor(age, raceInd):Array{
 		if (raceInd == 0){
 			if (age < 40) return hr_clrs[random(5)];
@@ -105,6 +108,31 @@ class gen_face_man{
 		if (age <= 40) return (age - 25) * 3 + random(10);
 		return Math.min(100, (age - 40) * 3 + random(21) - 10);
 	}
+	static function bodyType(age){
+		if (age < 10) return 'kid';
+		if (age < 15) return ((new Array('slim', 'norm'))[random(2)]);
+		if (age < 40) return ((new Array('slim', 'norm', 'power', 'fat'))[random(4)]);
+		if (age < 55) return ((new Array('slim', 'norm', 'old', 'fat'))[random(4)]);
+		return ((new Array('slim', 'old', 'fat'))[random(3)]);
+	}
+	static function bodyHairTypeLeg(age, bodyHair):Number{
+		if (age <= 10) return 10;
+		if (age <= 16) return Math.min(bodyHair, 10 - random(5));
+		if (age <= 25) return Math.min(bodyHair, 10 - random(8));
+		return Math.min(bodyHair, 1 + random(8));
+	}
+	static function bodyHairTypeBody(age, raceInd):Number{
+		if (age <= 10) return 13 - random(3);
+		if (age <= 18) return 13 -  random(6);
+		if (age <= 50) return 1 + random(9);
+		return 10 - random(10);
+	}
+	static function bodyHairTypeAss(age, raceInd):Number{
+		if (age <= 8) return 5;
+		if (age <= 15) return 4 - random(4);
+		return 1+random(2);
+	}
+	
 	
 	// gender : male = 1, female = 0
 	static function generateView(person, age, gender, raceInd){
@@ -124,13 +152,18 @@ class gen_face_man{
 		person.view_mimic_alpha = mimicRandomAlpha(age);
 		person.view_hair_color = hairColorOffset(hairRandomColor(age, raceInd), 10);
 		person.view_hair2_color = hairColorOffset(person.view_hair_color, 15);
-		person.view_hair_body_color = hairColorDiff(person.view_hair2_color, -(5+random(15)));
 		person.view_skin_color = raceRandomColor(raceInd);
 		person.view_head_scaleX = 95+random(11);
 		person.view_head_scaleY = 95+random(11);
 		person.view_head_eye_scale = 70 + random(51);
 		
-		
+		person.view_hair_body_color = 
+			(random(4) && raceInd != 1)? hairRandomDarkColor() : 
+			hairColorDiff(person.view_hair2_color, -(5+random(15)));
+		person.view_body_type = bodyType(age);
+		person.view_body_hair_body_type = bodyHairTypeBody(age, raceInd);
+		person.view_body_hair_ass_type = bodyHairTypeAss(age, raceInd);
+		person.view_body_hair_leg_type = bodyHairTypeLeg(age, person.view_body_hair_body_type);
 	}
 	
 	static function proectFace(person, head){
@@ -158,14 +191,20 @@ class gen_face_man{
 	}
 	
 	static var bodyPartNames = 't012345';
+	
 	static function proectBody(person){
-		person.gotoAndStop(1 + random(4)*3);
+		person.gotoAndStop(person.view_body_type);
 		ut.colorTo(person.skin, person.view_skin_color);
 		for (var i = 0; i < 7; ++i){
-			person['h'+bodyPartNames.charAt(i)].stop();
+			var gotoFrame = person.view_body_hair_leg_type;
+			if (i == 1) gotoFrame = person.view_body_hair_ass_type;
+			if (i == 0) gotoFrame = person.view_body_hair_body_type;
+			
+			person['h'+bodyPartNames.charAt(i)].gotoAndStop(gotoFrame);
 			ut.colorTo(person['h'+bodyPartNames.charAt(i)], person.view_hair_body_color);
 		}
 		person.info.text = person.age;
+		person.cacheAsBitmap = true;
 	}
 	
 }
