@@ -108,12 +108,22 @@ class gen_face_man{
 		if (age <= 40) return (age - 25) * 3 + random(10);
 		return Math.min(100, (age - 40) * 3 + random(21) - 10);
 	}
-	static function bodyType(age){
-		if (age < 10) return 'kid';
-		if (age < 15) return ((new Array('slim', 'norm'))[random(2)]);
-		if (age < 40) return ((new Array('slim', 'norm', 'power', 'fat'))[random(4)]);
-		if (age < 55) return ((new Array('slim', 'norm', 'old', 'fat'))[random(4)]);
-		return ((new Array('slim', 'old', 'fat'))[random(3)]);
+	static function bodyType(age, gender){
+		if (age < 10) return 'kid' + gender;
+		if (age < 15) return ((new Array('slim', 'norm'))[random(2)]) + gender;
+		if (age < 40) {
+			if (gender == 1) return ((new Array('slim', 'norm', 'power', 'fat'))[random(4)]) + 1;
+			return ((new Array('slim', 'norm', 'power', 'fat','norm', 'fat'))[random(6)]) + 0;
+		}
+		if (age < 55) return ((new Array('slim', 'norm', 'old', 'fat'))[random(4)]) + gender;
+		return ((new Array('slim', 'old', 'fat'))[random(3)]) + gender;
+	}
+	static function titsType(age){
+		if (age < 10) return 1 + random(2);
+		if (age < 18) return 1 + random(6);
+		if (age < 29) return 2 + random(8);
+		if (age < 45) return 4 + random(7);
+		return 7 + random(4);
 	}
 	static function bodyHairTypeLeg(age, raceInd, bodyHair):Number{
 		var func = Math.min;
@@ -171,9 +181,12 @@ class gen_face_man{
 		person.view_head_scaleX = 95+random(11);
 		person.view_head_scaleY = 95+random(11);
 		person.view_head_eye_scale = 70 + random(51);
+		if (!gender)// female
+			person.view_tit_type = titsType(age);
+		
 		
 		person.view_hair_body_color = randomBodyHairColor(raceInd, person.view_hair2_color);
-		person.view_body_type = bodyType(age);
+		person.view_body_type = bodyType(age, gender);
 		person.view_body_hair_body_type = bodyHairTypeBody(age, raceInd);
 		person.view_body_hair_ass_type = bodyHairTypeAss(age);
 		person.view_body_hair_leg_type = bodyHairTypeLeg(age, raceInd, person.view_body_hair_body_type);
@@ -209,6 +222,10 @@ class gen_face_man{
 	
 	static function proectBody(person){
 		person.gotoAndStop(person.view_body_type);
+		if (person.view_tit_type != undefined){
+			person.tits.gotoAndStop(person.view_tit_type);
+			ut.colorTo(person.tits.skin, person.view_skin_color);
+		}
 		//var invalid = random(3);if (random(3))while(--invalid > 0)person.nextFrame();
 		// hands
 		var hands:Array = new Array(person.hand_right, person.hand_left, person.hand_right2, person.hand_left2);
