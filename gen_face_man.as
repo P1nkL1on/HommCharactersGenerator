@@ -97,7 +97,7 @@ class gen_face_man{
 						 hairRGB[2] + diff);
 	}
 	static function mimicRandomType(age, gender):Number{
-		if (gender != 1) return -1;
+		//if (gender != 1) return -1;
 		
 		if (age < 25) return 1;
 		if (age < 40) return 1 + random(3);
@@ -150,11 +150,11 @@ class gen_face_man{
 		return ((random(2+raceInd)) && raceInd != 1 && !(!random(5) && hair2[0]>50))? hairRandomDarkColor() : 
 				hairColorDiff(hair2, -(5+random(15)));
 	}
-	static function randomHandType (bodyT):Number{
-		if (bodyT == 'kid') return 5;
-		if (bodyT == 'old') return (new Array(1,2,5))[random(3)];
-		if (bodyT == 'power') return 3+random(2);
-		if (bodyT == 'slim') return 2;
+	static function randomHandType (bodyT, gender):Number{
+		if (bodyT.indexOf('kid') == 0) return 5;
+		if (bodyT.indexOf('old') == 0) return (new Array(1,2,5))[random(3)];
+		if (bodyT.indexOf('power') == 0) return 3+random(2)*gender;
+		if (bodyT.indexOf('slim') == 0) return 2;
 		return 1+random(3);
 	}
 	
@@ -165,12 +165,13 @@ class gen_face_man{
 		person.gender = gender;
 		person.raceInd = raceInd;
 		
-		person.view_head_type = random(7)+1
+		
+		do {person.view_head_type = random(9 - 2*gender)+1; }while(person.view_head_type == 7 && !gender);
 		person.view_ears_type = random(7)+1
-		person.view_eyes_type = random(20)+1
-		person.view_broves_type = random(15)+1
-		person.view_nose_type = random(18)+1
-		person.view_mouth_type = random(20)+1
+		person.view_eyes_type = 	(!gender)? (1+random(19)) : (10+random(20))
+		person.view_broves_type = 	(!gender)? (1+random(9)) : (1+random(15))
+		person.view_nose_type = 	(!gender)? (1+random(16)) : (6+random(18))
+		person.view_mouth_type = 	(!gender)? (1+random(15)) : (10+random(20))
 		person.view_hair_type = hairRandomStyle(age, gender)
 		person.view_hair2_type = (gender == 1)? manBeardRandomStyle(age) : 1;
 		person.view_mimic_type = mimicRandomType(age, gender);
@@ -181,8 +182,6 @@ class gen_face_man{
 		person.view_head_scaleX = 95+random(11);
 		person.view_head_scaleY = 95+random(11);
 		person.view_head_eye_scale = 70 + random(51);
-		if (!gender)// female
-			person.view_tit_type = titsType(age);
 		
 		
 		person.view_hair_body_color = randomBodyHairColor(raceInd, person.view_hair2_color);
@@ -191,7 +190,11 @@ class gen_face_man{
 		person.view_body_hair_ass_type = bodyHairTypeAss(age);
 		person.view_body_hair_leg_type = bodyHairTypeLeg(age, raceInd, person.view_body_hair_body_type);
 		
-		person.view_hand_type = randomHandType(person.view_body_type);
+		if (!gender){// female
+			person.view_tit_type = titsType(age);
+			person.view_body_hair_leg_type = Math.min(10-1*(age>20), Math.round(person.view_body_hair_leg_type + 4));
+		}
+		person.view_hand_type = randomHandType(person.view_body_type, gender);
 	}
 	
 	static function proectFace(person, head){
