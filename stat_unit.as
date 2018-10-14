@@ -20,6 +20,9 @@ class stat_unit{
 		stat_engine.addStat(who, new Array('пол', gender));
 		stat_engine.addStat(who, new Array('имя', name));
 		stat_engine.addStat(who, new Array('фамилия', lastName));
+		
+		who.name = stat_engine.watchStat(who, 'имя')[1] + '_' + stat_engine.watchStat(who, 'фамилия')[1];
+		
 	}
 
 }

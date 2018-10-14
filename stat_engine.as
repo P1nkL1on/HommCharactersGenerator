@@ -1,5 +1,27 @@
 class stat_engine{
 
+	static function test(){
+		var o:Object = new Object();
+		o.name = 'unit';
+		stat_unit.setName(o, undefined, undefined, 'человек', 'М', 25);
+		
+		addStat(o, new Array('сила', 12));
+		addStat(o, new Array('проворность', 4));
+		
+		
+		changeStat(o, 'проворность', 1, 'ловкость');
+		incrementStat(o, 'ловкость', 2, -10);
+		incrementStat(o, 'ловкость', 2, +10);
+		
+		trace('result2: ' + getStat(o, new Array('телосложение')));
+		
+		incrementStat(o, 'телосложение', 2, +1);
+		
+		listStats(o);
+	}
+
+
+
 	static function addStatHolder(who){
 		who.stats = new Array();
 		who.hasStats = true;
@@ -20,12 +42,22 @@ class stat_engine{
 		return -1;
 	}
 	
-	// static function getStat(who, statName):Array{
-		// var statInd = statIndex(who, statName);
-		// if (statInd < 0)
-			// return null;
-		// return who.stats[statInd];
-	// }
+	static function watchStat(who, statName):Array{
+		var statInd = statIndex(who, statName);
+		if (statInd < 0) return null;
+		return who.stats[statInd];
+	}
+	
+	// !!!! get is like watch, but if none, then add default and return it!
+	static function getStat(who, statName):Array{
+		var statInd = statIndex(who, statName);
+		if (statInd < 0){
+			ut.Trace('requested ' + statName + ' from ' + who.name+', but none found. Adding default ' + statName);
+			addStat(who, statName);
+			statInd = who.stats.length - 1;
+		}
+		return who.stats[statInd];
+	}
 	
 	// static function getStatParameter(who, statName, paramIndex){
 		
@@ -84,21 +116,4 @@ class stat_engine{
 		ut.Trace(vas + who.stats[statInd][statParamInd]);
 	}
 
-	
-	
-	static function test(){
-		var o:Object = new Object();
-		o.name = 'unit';
-		stat_unit.setName(o, undefined, undefined, 'человек', 'М', undefined);
-		
-		addStat(o, new Array('сила', 12));
-		addStat(o, new Array('проворность', 4));
-		
-		
-		changeStat(o, 'проворность', 1, 'ловкость');
-		incrementStat(o, 'ловкость', 2, -10);
-		incrementStat(o, 'ловкость', 2, +10);
-		
-		listStats(o);
-	}
 }
