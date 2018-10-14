@@ -3,8 +3,12 @@
 	
 	class ut{
 	
+		static function Trace(mess){
+			trace('>' + mess);
+		}
+	
 		static function atLeast(X, value):Boolean{
-			trace(X+'/'+value)
+			Trace(X+'/'+value)
 			return X >= value;
 		}
 		static function atMax (X, value):Boolean{

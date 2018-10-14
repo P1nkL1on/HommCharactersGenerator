@@ -66,7 +66,7 @@ class gen_face_man{
 	static function hairRandomStyle(age, gender):Number{
 		if (gender != 1){	
 			if (age < 2 || age > 90) return 26;			// BOLD WOMEN!
-			if ((age < 26 && random(5) != 0) || random(3) == 0)
+			if ((age < 36 && random(5) != 0) || random(3) == 0)
 				return randomGirlFreeHair(age);
 			return randomGirlLockedHair(age); 
 		}
@@ -239,41 +239,40 @@ class gen_face_man{
 	
 	static var bodyPartNames = 't012345';
 	
-	static function proectBody(person){
-		person.gotoAndStop(person.view_body_type);
+	static function proectBody(person, person_model:MovieClip){
+		person_model.gotoAndStop(person.view_body_type);
 		if (person.view_tit_type != undefined){
-			person.tits.gotoAndStop(person.view_tit_type);
-			ut.colorTo(person.tits.skin, person.view_skin_color);
+			person_model.tits.gotoAndStop(person.view_tit_type);
+			ut.colorTo(person_model.tits.skin, person.view_skin_color);
 		}
 		//var invalid = random(3);if (random(3))while(--invalid > 0)person.nextFrame();
 		// hands
-		var hands:Array = new Array(person.hand_right, person.hand_left, person.hand_right2, person.hand_left2);
+		var hands:Array = new Array(person_model.hand_right, person_model.hand_left, person_model.hand_right2, person_model.hand_left2);
 		for (var i = 0; i < 4; ++i) if (hands[i] != undefined){
 			hands[i].gotoAndStop(person.view_hand_type);
 			ut.colorTo(hands[i].skin, person.view_skin_color);
 		}
 		
-		ut.colorTo(person.skin, person.view_skin_color);
+		ut.colorTo(person_model.skin, person.view_skin_color);
 		for (var i = 0; i < 7 + 4; ++i){
 			var gotoFrame = person.view_body_hair_leg_type;
 			if (i == 1) gotoFrame = person.view_body_hair_ass_type;
 			if (i == 0) gotoFrame = person.view_body_hair_body_type;
 			
-			var hair_element = person['h'+bodyPartNames.charAt(i)];
+			var hair_element = person_model['h'+bodyPartNames.charAt(i)];
 			if (i >= 7){ 
 				var hand = hands[Math.floor((i - 7)/2 + .1)];
 				hair_element = hand['h'+((i - 7) % 2 + 1)]; 
-				trace(hair_element)
 			}
 			hair_element.gotoAndStop(gotoFrame);
 			ut.colorTo(hair_element, person.view_hair_body_color);
 		}
-		person._xscale = person.view_body_scaleX;
-		person._y -= person._height * (person.view_body_scaleY - 100)/200;
-		person._yscale = person.view_body_scaleY;
+		person_model._xscale = person.view_body_scaleX;
+		person_model._y -= person._height * (person.view_body_scaleY - 100)/200;
+		person_model._yscale = person.view_body_scaleY;
 		
-		person.info.text = Math.round(person.age);//+' '+person.raceInd;
-		person.cacheAsBitmap = true;
+		person_model.info.text = Math.round(person.age);//+' '+person.raceInd;
+		person_model.cacheAsBitmap = true;
 	}
 	
 }
