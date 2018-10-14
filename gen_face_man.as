@@ -51,8 +51,25 @@ class gen_face_man{
 		return rgb;
 	}
 	
+	static function randomGirlFreeHair(age):Number{
+		if (age < 10) return 30 + random(5);
+		if (age < 24) return 34 + random(11);
+		if (age < 50) return 30 + random(17);
+		return (random(3)==0)? (30+random(8)):(44+random(3));
+	}
+	static function randomGirlLockedHair(age):Number{
+		if (age < 10) return 47 + random(15);
+		if (age < 50) return 47 + random(19);
+		return 70 - random(6);
+	}
+	
 	static function hairRandomStyle(age, gender):Number{
-		if (gender != 1)	return 26;			// BOLD WOMEN!
+		if (gender != 1){	
+			if (age < 2 || age > 90) return 26;			// BOLD WOMEN!
+			if ((age < 26 && random(5) != 0) || random(3) == 0)
+				return randomGirlFreeHair(age);
+			return randomGirlLockedHair(age); 
+		}
 	
 		if (random(8) == 0) return random(26)+1;	// chance to have exactly random hair
 		if (age <= 4) return 24 + random(3);		// bold children
@@ -153,8 +170,9 @@ class gen_face_man{
 	static function randomHandType (bodyT, gender):Number{
 		if (bodyT.indexOf('kid') == 0) return 5;
 		if (bodyT.indexOf('old') == 0) return (new Array(1,2,5))[random(3)];
-		if (bodyT.indexOf('power') == 0) return 3+random(2)*gender;
 		if (bodyT.indexOf('slim') == 0) return 2;
+		if (gender == 0) return 1 + 5 * random(2);
+		if (bodyT.indexOf('power') == 0) return 3+random(2);
 		return 1+random(3);
 	}
 	
@@ -182,7 +200,8 @@ class gen_face_man{
 		person.view_head_scaleX = 95+random(11);
 		person.view_head_scaleY = 95+random(11);
 		person.view_head_eye_scale = 70 + random(51);
-		
+		person.view_body_scaleX = 96 + random(8);
+		person.view_body_scaleY = 94 + random(8 + 6 * gender);
 		
 		person.view_hair_body_color = randomBodyHairColor(raceInd, person.view_hair2_color);
 		person.view_body_type = bodyType(age, gender);
@@ -208,10 +227,7 @@ class gen_face_man{
 		head.hair2.gotoAndStop(person.view_hair2_type);
 		head.mimic.gotoAndStop(person.view_mimic_type);
 		head.mimic._alpha = (person.view_mimic_alpha);
-		
 		head.eyes._xscale = head.eyes._yscale = person.view_head_eye_scale;
-		//head._xscale = person.view_head_scaleX; 
-		//head._yscale = person.view_head_scaleY;
 				
 		ut.colorTo(head.skin, person.view_skin_color);
 		ut.colorTo(head.ears.skin, person.view_skin_color);
@@ -252,7 +268,11 @@ class gen_face_man{
 			hair_element.gotoAndStop(gotoFrame);
 			ut.colorTo(hair_element, person.view_hair_body_color);
 		}
-		person.info.text = person.age+' '+person.raceInd;
+		person._xscale = person.view_body_scaleX;
+		person._y -= person._height * (person.view_body_scaleY - 100)/200;
+		person._yscale = person.view_body_scaleY;
+		
+		person.info.text = Math.round(person.age);//+' '+person.raceInd;
 		person.cacheAsBitmap = true;
 	}
 	
