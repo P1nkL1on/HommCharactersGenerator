@@ -6,6 +6,9 @@
 		static function Trace(mess){
 			trace('>' + mess);
 		}
+		static function TraceDebug(mess){
+			trace('@		' + mess);
+		}
 	
 		static function atLeast(X, value):Boolean{
 			Trace(X+'/'+value)

@@ -6,20 +6,25 @@ class stat_engine{
 		var en:Object = new Object();
 		en.name = 'sucker knight';
 		o.name = 'unit';
-		o.setName(o, undefined, undefined, 'человек', 'ћ', 25);
+		unit_stat.setName(o, undefined, undefined, 'человек', 'ћ', 25);
+		//unit_stat.setName(o, '“они', '√олубов', 'человек', 'ћ', 25);
 		
 		addStat(o, createStat('сила', 12));
-		addStat(o, createStat('проворность', 4));
+		addStat(o, createStat('проворность', new Array(4, 5,6)));
 		
 		addStat(o, createStat('рана', new Array(2, 4, 8), 'состо€ние-болезнь', undefined, en));
 		addStat(o, createStat('рана', new Array(1, 3, 8), 'состо€ние-болезнь', undefined, en));
 		addStat(o, createStat('рана', new Array(2, 2, 8), 'состо€ние-болезнь', undefined, en));
 		addStat(o, createStat('рана', new Array(3, 1, 16), 'состо€ние-болезнь', undefined, statWithName(o, 'рана', 2)));
 		
-		//changeUniqueStatValue();
+		changeUniqueStatValue(o, 'сила', 11);
+		changeUniqueStatValue(o, 'проворность', 10,1);
+		changeStatValue(o, 'проворность', undefined, 12,1);
+		changeStatValue(o, 'рана', undefined, 3);
+		changeStatValue(o, 'рана', 3, 2);
 		
 		trace('');
-		trace('');
+		trace(watchUniqueStatValue(o, 'проворность', 2));
 		listStats(o)
 		
 		
@@ -44,11 +49,11 @@ class stat_engine{
 		var nStat:Object = new Object();
 		nStat.name = name;
 		if (value == undefined) nStat.value = new Array(); else {
-			var isArray = isNaN(value + 5);
+			var isArray = (typeof(value) +'')== 'object'; // string + 5 == isNaN
 			if (isArray)
 				nStat.value = value;
 			else{
-				nStat.value = new Array(); nStat.value.push(value);	// add a {value1}, non valu1
+				nStat.value = new Array(); nStat.value.push(value);// add a {value1}, non valu1
 			}
 		}
 		if (category == undefined) nStat.category = 'стат'; else nStat.category = category;
@@ -108,13 +113,14 @@ class stat_engine{
 			traceStat(who.stats[i]);
 	}
 	
-	
 	static function statsWithName(who, statName:String):Array{
+		ut.TraceDebug('want to find all "' + statName + '" stats for ' + who.name);
 		if (who.hasStats != true) return new Array();
 		var arr = new Array();
 		for (var i = 0; i < who.stats.length; ++i)
 			if (who.stats[i].name == statName)
 				arr.push(who.stats[i]);
+		ut.TraceDebug('+ found '+arr.length+' stats with name "' + statName);
 		return arr;
 	}
 	
@@ -124,16 +130,24 @@ class stat_engine{
 	
 	static function statWithName(who, statName:String, indexMult):Object{
 		var arr = statsWithName(who, statName);
-		if (arr.length == 0) {ut.Trace(who.name + ' has no stat named ' + statName); return undefined;}
-		if (arr.length == 1) return arr[0];
+		if (arr.length == 0) {ut.TraceDebug('! ' + who.name + ' has no stat named ' + statName); return undefined;}
+		if (arr.length == 1) {ut.TraceDebug('+ return unique stat "' + statName); return arr[0];}
 		if (indexMult != undefined) return arr[indexMult];
-		// indexMult == undefined -> get first, if other said
 		ut.Trace(who.name + ' has ' + arr.length + ' stats named ' + statName + ' but get only first!');
 		return arr[0];
 	}
 	
 	static function watchStatValue(who, statName:String, indexMult):Array{
-		return statWithName(who, statName, indexMult).value;
+		ut.TraceDebug('want watch "' + statName + '" value (array)');
+		return (statWithName(who, statName, indexMult)).value;
+	}
+	
+	static function watchUniqueStatValue(who, statName:String, paramIndex):Number{
+		if (paramIndex == undefined) paramIndex = 0;
+		ut.TraceDebug('want watch "' + statName + '" param # ' + paramIndex);
+		var res:Array = watchStatValue(who, statName, undefined);
+		ut.TraceDebug('+ geted array value of unique stat "' + statName+'" :: ' + res); 
+		return res[paramIndex];
 	}
 	
 	static function statIndexWithName (who, statName:String, indexMult):Number{
@@ -149,14 +163,17 @@ class stat_engine{
 		var statIndex = statIndexWithName(who, statName, indexMult);
 		if (paramNumber == undefined) 
 			paramNumber = 0;
-		if (newValue != undefined)
+		if (newValue != undefined){
+			ut.Trace('  '+who.stats[statIndex].value[paramNumber] + " -> " + newValue + '    ' + who.name+'\'s '+  who.stats[statIndex].name + ((indexMult != undefined)? (' (' +indexMult+ ')'): ('')));
 			who.stats[statIndex].value[paramNumber] = newValue;
+		}
 		return who.stats[statIndex];
 	}
 	
 	static function changeUniqueStatValue(who, statName:String, newValue, paramNumber):Object{
 		return changeStatValue(who, statName, undefined, newValue, paramNumber);
 	}
+	
 	
 	// static function statIndex(who, statName:String):Number{
 		// if (who.hasStats != true)

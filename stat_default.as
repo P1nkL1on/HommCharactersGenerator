@@ -8,16 +8,16 @@ class stat_default{
 		// параметр имя имеет некоторые дефолтные значения
 		// 
 		new Array(new Array('name', 'имя'), 
-			new Array('раса-гном;пол-Ж', 'Марта'),
-			new Array('раса-гном;пол-М', 'Ульрих'),
-			new Array('раса-человек;пол-Ж', 'Мари'),
-			new Array('раса-человек;пол-М', 'Вильям'),
-			new Array('', '??')
+			new Array('раса:гном|пол-Ж', 'Марта'),
+			new Array('раса:гном|пол-М', 'Ульрих'),
+			new Array('раса:человек|пол-Ж', 'Мари'),
+			new Array('раса:человек|пол-М', 'Вильям'),
+			new Array('', 'Безымянный')
 			),
 		new Array(new Array('lastname', 'фамилия'), 
-			new Array('раса-гном', 'Берсон'),
-			new Array('раса-человек', 'Стоун'),
-			new Array('', '??')
+			new Array('раса:гном', 'Берсон'),
+			new Array('раса:человек', 'Стоун'),
+			new Array('', 'Безфамильный')
 			),
 			
 		new Array(new Array('str','strength','сил','сила'), new Array('', 8)),
@@ -26,7 +26,7 @@ class stat_default{
 	
 	);
 
-	// static function goCheckCondition(who, template):Boolean{
+	static function goCheckCondition(who, template):Boolean{
 		// !!!ut.Trace('  testing ' + who.name + " for a " + template);
 		// var rules:Array = template.split(';');
 		// var result = true;
@@ -45,43 +45,43 @@ class stat_default{
 				// { /* ut.Trace(' X ' + who.name + ': ' + rules[i][0] + ' is not ' + rules[i][1]); */ return false; }
 		// }
 		// ut.Trace('  Luckly, ' + who.name + ' is ' + template);
-		// return result;
-	// }
+		return false;//result;
+	}
 	
 	 static function getDefaultStat(who, statName):Object{
-		// ut.Trace('  Finding a default value for ' + who.name + ': ' + statName);
-		// var resultStat:Array = new Array();
-		// resultStat.push(statName);
-		// for (var stDefInd = 0; stDefInd < statDefault.length; ++stDefInd){
-			// var statNameVariants = statDefault[stDefInd][0];
-			// var nameIndT = -1;
-			// for (var nameInd = 0; nameInd < statDefault[stDefInd][0].length; ++nameInd){
-				// var possibleName = statDefault[stDefInd][0][nameInd];
-				// !!!!!!!!!! ut.Trace('  Equals? ' + statName + '  ' + possibleName);
-				// if (possibleName == statName || (possibleName.charAt(0) == '%' && (statName.indexOf(possibleName.substr(1)) >= 0)))
-					// {nameIndT = nameInd; ut.Trace('  Exist a default param with name ' + statName + ': ' + nameIndT);break;}
-			// }
-			// if (nameIndT >= 0){
-				// var statName = statDefault[stDefInd][0][nameIndT];
-				// for (var caseInd = 1; caseInd < statDefault[stDefInd].length; ++caseInd){
-					// var goCopy = false;
-					// if (statDefault[stDefInd][caseInd][0] == '' )	// no condition
-						// goCopy = true;
-					// else
-						// goCopy = goCheckCondition(who, statDefault[stDefInd][caseInd][0]);// go check condition
-					// if (goCopy == true){
-						// for (var i = 1; i < statDefault[stDefInd][caseInd].length; ++i)
-							// resultStat.push(statDefault[stDefInd][caseInd][i]);
-						// ut.Trace('  So, ' + statName + ' becomes -> ' + resultStat);
-						// return resultStat;
-					// }						
-				// }
+		ut.Trace('  Finding a default value for ' + who.name + ': ' + statName);
+		var resStatName:String = statName;
+		var resStatValue:Array = new Array();
+		//resultStat.push();
+		for (var stDefInd = 0; stDefInd < statDefault.length; ++stDefInd){
+			var statNameVariants = statDefault[stDefInd][0];
+			var nameIndT = -1;
+			for (var nameInd = 0; nameInd < statDefault[stDefInd][0].length; ++nameInd){
+				var possibleName = statDefault[stDefInd][0][nameInd];
+				//!!!!!!!!!! ut.Trace('  Equals? ' + statName + '  ' + possibleName);
+				if (possibleName == statName || (possibleName.charAt(0) == '%' && (statName.indexOf(possibleName.substr(1)) >= 0)))
+					{nameIndT = nameInd; ut.Trace('  Exist a default param with name ' + statName + ': ' + nameIndT);break;}
+			}
+			if (nameIndT >= 0){
+				var statName = statDefault[stDefInd][0][nameIndT];
+				for (var caseInd = 1; caseInd < statDefault[stDefInd].length; ++caseInd){
+					var goCopy = false;
+					if (statDefault[stDefInd][caseInd][0] == '' )	// no condition
+						goCopy = true;
+					else
+						goCopy = goCheckCondition(who, statDefault[stDefInd][caseInd][0]);// go check condition
+					if (goCopy == true){
+						for (var jj = 1; jj < statDefault[stDefInd][caseInd].length; ++jj)
+							resStatValue.push(statDefault[stDefInd][caseInd][jj]);
+						var newStat = stat_engine.createStat(resStatName, resStatValue);
+						ut.Trace('  So, ' + statName + ' becomes -> ' + stat_engine.statToString(newStat));
+						return newStat;
+					}						
+				}
 				
-				// ut.Trace('Bad, but there is no default values with condition getting. ' + who + ' ' + statName);
-			// }
-		// }
-		// resultStat.push(undefined);
-		// return resultStat;
-		return undefined;
+				ut.Trace('Bad, but there is no default values with condition getting. ' + who + ' ' + statName);
+			}
+		}
+		return stat_engine.createStat(resStatName, undefined);
 	}
 }
