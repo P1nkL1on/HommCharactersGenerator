@@ -8,10 +8,11 @@ class stat_default{
 		// параметр имя имеет некоторые дефолтные значения
 		// 
 		new Array(new Array('name', 'имя'), 
-			new Array('раса:гном|пол-Ж', 'Марта'),
-			new Array('раса:гном|пол-М', 'Ульрих'),
-			new Array('раса:человек|пол-Ж', 'Мари'),
-			new Array('раса:человек|пол-М', 'Вильям'),
+			new Array('жопа:широкая|пол:Ж', 'Жирная Марта'),
+			new Array('раса:гном|пол:Ж', 'Марта'),
+			new Array('раса:гном|пол:М', 'Ульрих'),
+			new Array('раса:человек|пол:Ж', 'Мари'),
+			new Array('раса:человек|пол:М', 'Вильям'),
 			new Array('', 'Безымянный')
 			),
 		new Array(new Array('lastname', 'фамилия'), 
@@ -27,29 +28,27 @@ class stat_default{
 	);
 
 	static function goCheckCondition(who, template):Boolean{
-		// !!!ut.Trace('  testing ' + who.name + " for a " + template);
-		// var rules:Array = template.split(';');
-		// var result = true;
-		// for (var i = 0; i < rules.length; ++i){
-			// rules[i] = rules[i].split('-');
-			// !!!если параметр 1 и его у юнита совсем нету, то сразу нет
-			// var hasThatParam = stat_engine.hasStatWithName(who, rules[i][0]);
-			// if (hasThatParam == false){ /* ut.Trace(' X ' + who.name + ' do not have a stat ' + rules[i][0]); */ return false; }
+		var rules:Array = template.split('|');
+		var result = true;
+		for (var i = 0; i < rules.length; ++i){
+			rules[i] = rules[i].split(':');
+			var statNam = rules[i][0];
+			var paramVal = rules[i][1];
 			
-			// var statInd = stat_engine.statIndex(who, rules[i][0]);
-			// var paramVal = rules[i][1];
-			// var isInArray = false;
-			// for (var j = 0; j < who.stats[statInd].length; ++j)
-				// if (who.stats[statInd][j] == paramVal) isInArray = true;
-			// if (isInArray != true)
-				// { /* ut.Trace(' X ' + who.name + ': ' + rules[i][0] + ' is not ' + rules[i][1]); */ return false; }
-		// }
-		// ut.Trace('  Luckly, ' + who.name + ' is ' + template);
-		return false;//result;
+			var val = stat_engine.watchStatValue(who, statNam);
+			
+			var found = false;
+			for (var j = 0; j < val.length; ++j)
+				if (val[j] == paramVal) found = true;
+			if (found != true)
+				{ ut.Trace('  - ' + who.name + ': ' + rules[i][0] + ' - не ' + paramVal);  return false; }
+		}
+		ut.TraceDebug('  Шаблон подходит: ' + who.name + ' является ' + template);
+		return result;//result;
 	}
 	
 	 static function getDefaultStat(who, statName):Object{
-		ut.Trace('  Finding a default value for ' + who.name + ': ' + statName);
+		ut.Trace('  Требуется найти дефолтное значение для ' + who.name + ': ' + statName);
 		var resStatName:String = statName;
 		var resStatValue:Array = new Array();
 		//resultStat.push();
@@ -58,9 +57,8 @@ class stat_default{
 			var nameIndT = -1;
 			for (var nameInd = 0; nameInd < statDefault[stDefInd][0].length; ++nameInd){
 				var possibleName = statDefault[stDefInd][0][nameInd];
-				//!!!!!!!!!! ut.Trace('  Equals? ' + statName + '  ' + possibleName);
 				if (possibleName == statName || (possibleName.charAt(0) == '%' && (statName.indexOf(possibleName.substr(1)) >= 0)))
-					{nameIndT = nameInd; ut.Trace('  Exist a default param with name ' + statName + ': ' + nameIndT);break;}
+					{nameIndT = nameInd; ut.Trace('  Существует параметр с именем "' + statName + '": ' + nameIndT);break;}
 			}
 			if (nameIndT >= 0){
 				var statName = statDefault[stDefInd][0][nameIndT];
@@ -74,12 +72,12 @@ class stat_default{
 						for (var jj = 1; jj < statDefault[stDefInd][caseInd].length; ++jj)
 							resStatValue.push(statDefault[stDefInd][caseInd][jj]);
 						var newStat = stat_engine.createStat(resStatName, resStatValue);
-						ut.Trace('  So, ' + statName + ' becomes -> ' + stat_engine.statToString(newStat));
+						ut.Trace('  Дефолтное значение для "' + statName + '" становится -> ' + stat_engine.statToString(newStat));
 						return newStat;
 					}						
 				}
 				
-				ut.Trace('Bad, but there is no default values with condition getting. ' + who + ' ' + statName);
+				ut.Trace('  - В базе дефолтных значений, нет правильного значения для ' + who + ':' + statName+ ', ему присвоено значение пустого массива {}');
 			}
 		}
 		return stat_engine.createStat(resStatName, undefined);

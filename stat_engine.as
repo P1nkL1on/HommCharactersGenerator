@@ -4,7 +4,7 @@ class stat_engine{
 	static function test(){
 		var o:Object = new Object();
 		var en:Object = new Object();
-		en.name = 'sucker knight';
+		en.name = 'Рыца Соса';
 		o.name = 'unit';
 		unit_stat.setName(o, undefined, undefined, 'человек', 'М', 25);
 		//unit_stat.setName(o, 'Тони', 'Голубов', 'человек', 'М', 25);
@@ -24,7 +24,7 @@ class stat_engine{
 		changeStatValue(o, 'рана', 3, 2);
 		
 		trace('');
-		trace(watchUniqueStatValue(o, 'проворность', 2));
+		trace(watchUniqueStatValueParam(o, 'проворность', 2));
 		listStats(o)
 		
 		
@@ -90,7 +90,7 @@ class stat_engine{
 		if (statCountWithName(who, stat.name) > 0){
 			// т.е. если это обычный стат, то низя
 			if (stat.category.indexOf ('стат') >= 0){
-				ut.Trace(who.name + ' already has stat with name ' + stat.name);
+				ut.Trace(who.name + ' уже имеет уникальный стат с именем "' + stat.name);
 				return;
 			}
 		}
@@ -98,13 +98,14 @@ class stat_engine{
 		if (stat.name != undefined){
 			var isEmpty = (stat.value.length == 0);
 			if (isEmpty){
-				ut.Trace('Added a stat ' + stat.name + ', but with no values, will get a default values!');
+				ut.Trace('Добавлено "' + stat.name + '", но, тк значение не передано, ему будет присвоено дефолтное значение.');
 				stat = stat_default.getDefaultStat(who, stat.name);
 			}
 		}
 		stat.host = who;
 		who.stats.push(stat);
-		ut.Trace(stat.name + ' added to ' + who.name+" :: \t" + statToString(stat));
+		ut.Trace(stat.name + ' теперь имеет "' + who.name+"\" " + stat.value);
+		traceStat(stat);
 	}
 	
 	static function listStats(who){
@@ -114,13 +115,13 @@ class stat_engine{
 	}
 	
 	static function statsWithName(who, statName:String):Array{
-		ut.TraceDebug('want to find all "' + statName + '" stats for ' + who.name);
+		ut.TraceDebug('? найти все статы "' + statName + '", которыми владеет ' + who.name);
 		if (who.hasStats != true) return new Array();
 		var arr = new Array();
 		for (var i = 0; i < who.stats.length; ++i)
 			if (who.stats[i].name == statName)
 				arr.push(who.stats[i]);
-		ut.TraceDebug('+ found '+arr.length+' stats with name "' + statName);
+		ut.TraceDebug('+ найдено '+arr.length+' стат(ов) с именем "' + statName);
 		return arr;
 	}
 	
@@ -142,11 +143,12 @@ class stat_engine{
 		return (statWithName(who, statName, indexMult)).value;
 	}
 	
-	static function watchUniqueStatValue(who, statName:String, paramIndex):Number{
+	static function watchUniqueStatValueParam(who, statName:String, paramIndex):Number{
 		if (paramIndex == undefined) paramIndex = 0;
 		ut.TraceDebug('want watch "' + statName + '" param # ' + paramIndex);
 		var res:Array = watchStatValue(who, statName, undefined);
 		ut.TraceDebug('+ geted array value of unique stat "' + statName+'" :: ' + res); 
+		ut.TraceDebug('+ geted neeeded value "' + statName+'"('+paramIndex+') :: ' + res[paramIndex]);
 		return res[paramIndex];
 	}
 	

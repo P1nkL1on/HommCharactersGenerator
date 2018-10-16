@@ -9,8 +9,8 @@ class unit_stat{
 		stat_engine.addStat(who, stat_engine.createStat('имя', name, 'биография'));
 		stat_engine.addStat(who, stat_engine.createStat('фамилия', lastName, 'биография'));
 		
-		var resName = stat_engine.watchUniqueStatValue(who, 'имя');
-		var resLastName = stat_engine.watchUniqueStatValue(who, 'фамилия');
+		var resName = stat_engine.watchUniqueStatValueParam(who, 'имя');
+		var resLastName = stat_engine.watchUniqueStatValueParam(who, 'фамилия');
 		trace(resName + '/' + resLastName);
 		var finName = "";
 		if (resName != undefined)
