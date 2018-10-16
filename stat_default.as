@@ -2,11 +2,13 @@
 
 class stat_default{
 
+	static var statDefaultCategory = new Array(
+		new Array('биография', new Array('имя','фамилия','отец','мать','брак','рождение','раса','пол'))
+		,new Array('состояние-болезнь', new Array('рана','перелом'))
+		,new Array('стат', new Array(2,3,4))
+	);
 	
 	static var statDefault = new Array(
-		
-		// параметр имя имеет некоторые дефолтные значения
-		// 
 		new Array(new Array('name', 'имя'), 
 			new Array('жопа:широкая|пол:Ж', 'Жирная Марта'),
 			new Array('раса:гном|пол:Ж', 'Марта'),
@@ -27,6 +29,14 @@ class stat_default{
 	
 	);
 
+	static function findDefaultCategory(statName){
+		for (var i = 0; i < statDefaultCategory.length; ++i)
+			for (var j = 0; j < statDefaultCategory[i][1].length; ++j)
+				if (statName == statDefaultCategory[i][1][j])
+					return statDefaultCategory[i][0];
+		return 'стат';
+	}
+	
 	static function goCheckCondition(who, template):Boolean{
 		var rules:Array = template.split('|');
 		var result = true;
@@ -41,14 +51,14 @@ class stat_default{
 			for (var j = 0; j < val.length; ++j)
 				if (val[j] == paramVal) found = true;
 			if (found != true)
-				{ ut.Trace('  - ' + who.name + ': ' + rules[i][0] + ' - не ' + paramVal);  return false; }
+				{ ut.TraceDebug('- ' + who.name + ': ' + rules[i][0] + ' - не ' + paramVal);  return false; }
 		}
-		ut.TraceDebug('  Шаблон подходит: ' + who.name + ' является ' + template);
+		ut.TraceDebug('> Шаблон подходит: ' + who.name + ' является ' + template);
 		return result;//result;
 	}
 	
 	 static function getDefaultStat(who, statName):Object{
-		ut.Trace('  Требуется найти дефолтное значение для ' + who.name + ': ' + statName);
+		ut.TraceDebug('? найти дефолтное значение для ' + who.name + ': ' + statName);
 		var resStatName:String = statName;
 		var resStatValue:Array = new Array();
 		//resultStat.push();
@@ -58,7 +68,7 @@ class stat_default{
 			for (var nameInd = 0; nameInd < statDefault[stDefInd][0].length; ++nameInd){
 				var possibleName = statDefault[stDefInd][0][nameInd];
 				if (possibleName == statName || (possibleName.charAt(0) == '%' && (statName.indexOf(possibleName.substr(1)) >= 0)))
-					{nameIndT = nameInd; ut.Trace('  Существует параметр с именем "' + statName + '": ' + nameIndT);break;}
+					{nameIndT = nameInd; ut.TraceDebug('+ Существует параметр с именем "' + statName + '": ' + nameIndT);break;}
 			}
 			if (nameIndT >= 0){
 				var statName = statDefault[stDefInd][0][nameIndT];
@@ -72,12 +82,13 @@ class stat_default{
 						for (var jj = 1; jj < statDefault[stDefInd][caseInd].length; ++jj)
 							resStatValue.push(statDefault[stDefInd][caseInd][jj]);
 						var newStat = stat_engine.createStat(resStatName, resStatValue);
-						ut.Trace('  Дефолтное значение для "' + statName + '" становится -> ' + stat_engine.statToString(newStat));
+						newStat.category = findDefaultCategory(newStat.name);
+						ut.Trace('Дефолтное значение для "' + statName + '" становится -> ' + stat_engine.statToString(newStat));
 						return newStat;
 					}						
 				}
 				
-				ut.Trace('  - В базе дефолтных значений, нет правильного значения для ' + who + ':' + statName+ ', ему присвоено значение пустого массива {}');
+				ut.TraceDebug('- В базе дефолтных значений, нет правильного значения для ' + who + ':' + statName+ ', ему присвоено значение пустого массива {}');
 			}
 		}
 		return stat_engine.createStat(resStatName, undefined);

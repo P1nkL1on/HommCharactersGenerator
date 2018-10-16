@@ -2,12 +2,12 @@
 	// constants and enums
 	
 	class ut{
-	
 		static function Trace(mess){
-			trace('>' + mess);
+			trace('@   ' + mess);
+			_root.console.text += "> " + mess +"\n";
 		}
 		static function TraceDebug(mess){
-			trace('@		' + mess);
+			trace('.			' + mess);
 		}
 	
 		static function atLeast(X, value):Boolean{
