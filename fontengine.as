@@ -1,12 +1,19 @@
 class fontengine{
 
-	static var letter_wid = 10;
-	static var letter_hei = 8;
-	static var letter_x_offset = 0.5;
+	static var letter_wid = 4;
+	static var letter_hei = 6;
+	static var letter_x_offset = 0.2;
 	static var letter_y_offset = 1;
 	
-	static function printIn( what, where, style, xOffset, yOffset, maxX){
-		if (style == undefined) style = 'okay';
+	
+	static var default_separators = " \n";
+	
+	static function printIn( what, where, style, xOffset, yOffset, maxX):MovieClip{
+		
+		var isArray = (typeof(what) +'')== 'object'
+		// if it is an array, then it should be any params like descriptions!
+	
+		if (style == undefined) style = 'test';
 		if (xOffset == undefined) xOffset = 0;
 		if (yOffset == undefined) yOffset = 0;
 		if (maxX == undefined) maxX = -1;
@@ -16,50 +23,93 @@ class fontengine{
 		yOffset += letter_hei;
 		
 		var charNumber = 0; 
-		var curX = xOffset;
-		var curY = yOffset;
-		var lineNumber = 0;
+		var curX = 0;
+		var curY = 0;
 	
 		if (where.textHandlerCount == undefined) 
 			where.textHandlerCount = 0;
+		where.lastWord = "";
+		
 		var th = where.attachMovie('letter_handler', 'text_handler_' + where.textHandlerCount, where.getNextHighestDepth());
-		for (var i = 0; i < what.length; ++i){
-			var nextLine = what.charAt(i) == '\n';
-			if (curX > maxX || nextLine){ curX = xOffset; lineNumber++; curY += letter_hei + letter_y_offset; }
-			if (nextLine) continue;
-			var letter = th.attachMovie('letter_' + style, 'l'+i, th.getNextHighestDepth());
-			var fr = what.charCodeAt(i); if (fr > 900) fr -= 900;
-			letter.gotoAndStop(fr);
-			letter._x = curX + letter._width / 2; curX += letter_x_offset + ((letter._width > .2)? letter._width : letter_wid);
-			letter._y = curY;
-			var rRot = random(21) - 10;
-			letter._rotation = rRot;
-			letter._x -= rRot / 20.0;
-			trace(what.charAt(i)+'   ' + fr);
+		th.wordCount = 0;
+		
+		var params;
+		if (isArray){
+			params = what;
+			what = what[0];
+		}
+		
+		var nowInWhat:Number = 0;
+		var descrptionUsed = 0;
+		while(nowInWhat < what.length){
+			var newWord:String = "";
+			var descriptionAble = 0;
+			var oneWord = false;
+			do{
+				if (what.charAt(nowInWhat) == '@'){
+					oneWord = !oneWord; 				// except @ 
+					if (!descriptionAble) descriptionAble = ++descrptionUsed;
+				}
+				else
+					newWord += what.charAt(nowInWhat); // add to word, or
+				nowInWhat++;
+			}while(default_separators.indexOf(what.charAt(nowInWhat)) < 0 || oneWord);
+			
+			var wd = th.attachMovie('word_handler', 'wrd'+(++th.wordCount), th.getNextHighestDepth());
+			var wCurX = 0;
+			for (var i = 1 - 1 * (th.wordCount == 1); i < newWord.length; ++i){
+				var letter = wd.attachMovie('letter_' + style, 'l'+i, wd.getNextHighestDepth());
+				var fr = newWord.charCodeAt(i); if (fr > 900) fr -= 900;
+				letter.gotoAndStop(fr);
+				letter._x = wCurX + letter_wid/2; 
+				wCurX += letter_x_offset + ((letter._width > .2)? letter._width : letter_wid);
+				letter._y = 4;
+			}
+			wd.b._width = wCurX;
+			var addWid = wd._width;
+			if (curX + addWid >= maxX){
+				curX = 0; curY += letter_hei;
+			}
+			wd._x = curX;
+			wd._y = curY;
+			curX += addWid + letter_wid;
+			
+			if (isArray && descriptionAble > 0){
+				//printIn(params[descriptionAble], where, style, curX, curY, 100);
+				wd.mouseOver = false;
+				wd.timer = 0;
+				wd.textStyle = style;
+				wd.descr = params[descriptionAble];
+				wd.printed = null;
+				wd.onMouseMove = function (){
+					this.mouseOver = (this.b.hitTest(_root._xmouse, _root._ymouse));
+				}
+				wd.onEnterFrame = function (){
+					if (!this.mouseOver) { this.timer = 0; if (this.printed != null){ this.printed.removeMovieClip(); this.printed = null; } return; }
+					this.timer ++;
+					if (this.timer != 41) return;
+					this.printed = printIn(this.descr, _root, this.textStyle, _root._xmouse, _root._ymouse, 100);
+				}
+				ut.colorTo(wd, 40, 100, 10);
+			}
 		}
 		where.textHandlerCount++;
+		th._xscale = th._yscale = 100;
 		th.cacheAsBitmap = true;
-		//trace(what+'/'+where+'/'+xOffset+'/'+yOffset+'/'+maxX+'/'+ where.textHandlerCount);
+		th._x = xOffset; th._y = yOffset;
+		return th;
 	}
 
 	static function test(){
+		var s = '';
+		var words = new Array('ты','всё','понимаешь','такой','тупой','боже','мой','как','таких','вообще','щемля','носит','оло','оа','заза','просто','случай','ны','й','набор','букв','и','слов','вдруг','повезеёт','и','тут','найдет','смысл','какой','нибудь','чухан');
+		for (var i = 0; i < 200; ++i) s+=' ' + words[random(words.length)];
+		
 		printIn(
-		'*Осторожно, много текста* !@#$%^&*() -0000\n0\n0000000----------- ::::::::::::::\n'
-		+'Друзья, как вы знаете, я местами люблю почитать Твиттер: посмотреть, что вообще люди пишут на разные темы. Так вот, сегодня я, волею судеб, нарвался на обсуждение состояния / пригодности и перспектив PUBG как соревновательной игры или, как сейчас модно говорить, - киберспортивной дисциплины.'
-		+'Я сам уже достаточно давно не играл турнирные игры и то, что я наблюдал, скролля посты в Твиттере, реально заставило меня, что называется, "заржать в голосяндру". Если вы, как и я, далеки от понимания того, что сейчас происходит в таких играх, то не поленитесь, зацените:'
-		+'https://twitter.com/Smithy9797/status/953091472169078785 (американский "про-игрок" Smithy97)'
-		+'Это еще, к слову, не самое забавное, в ленте я набрел на пост от известного игрока TSM - Break\'a:'
-		+'https://mobile.twitter.com/mjyoh_/status/953173297616883712 (ссылка на видео - https://www.youtube.com/watch?v=xTbXrI7XweU).'
-		+'Подобного кстати много: стоит заглянуть в Твиттер любого "плюс-минус" известного игрока по PUBG: Scoom, Hayz, Jeemzz и многих других, — всё одно и то же.'
-		+'Почему именно сейчас все так активно заговорили об этом? Напоминаю, что в 20-х числах начинаются открытые (об этом позже) квалификации по PUBG на IEM Katowice с общим призовым в размере 50,000$, и что более важно, в марте пройдет ПЕРВЫЙ обособленный от PUBG Corp турнир от всем известной организации StarLadder. Обособленный — т.е. организуемый не самими PUBG Corp, а непосредственно Старладдером и результаты турнира (именно в техническом плане) покажут, пригодна ли игра в целом для больших соревновательных форматов без участия создателей игры. '
-		+'Я знаю, что PUBG Corp активно работают над улучшением технической составляющей игры: серверов, оптимизации и всего-всего, но есть реальные опасения, что на предстоящих турнирах мы увидим абсолютно неприемлемые условия игры (всячески надеюсь, что этого не будет все же, но...), массу абсурдных смертей и подобного тому, что вы могли наблюдать на клипах выше.'
-		+'Был ли смысл анонсировать даже Promotional-турниры в ближайшие даты, учитывая нынешнее состояние игры, тем более с открытыми квалификациями? Хороший вопрос! Кстати, чтобы вы понимали, открытые квалификации — это игры в режиме онлайн, участие в коих может принять любой желающий. Если любой может принять участие, то как защититься от возможных читеров? (очевидно, что ради попадания на LAN с призовым в 50к баксов многие готовы пойти на риск). Ответ прост: да никак. Игра тупо не дает возможности детектить читеров, а нынешние Spectator-мод и механика повторов едва ли позволяет выявить нечестную игру, что превращает весь процесс в "охоту на ведьм".'
-		+'Период этих турниров весьма удачно совпал с моим временем "инактива" в турнирном PUBG (не связан с представленными выше причинами). '
-		+'Однако, по ходу пьесы я продолжаю раздумывать, стоит ли игра свеч? Стоит ли тратить нервы (турнирные игры в PUBG — это все же очень большой стресс), усилия и знатную часть свободного времени на игру в таком сыром состоянии, когда можно получать массу фана, играя в "казуальном" режиме?'
-		+'Так или иначе, я очень надеюсь, что в скором времени ситуация изменится — игроки смогут комфортно чувствовать себя в соревновательных играх, выявляя реально самого сильного в турнирных условиях, а зрители смогут по полной насладиться качественным геймплеем в трансляциях. '
-		+'Хочу пожелать удачи и успехов команде StarLadder\'а в организации проведении первого LAN\'a, от хода их турнира, по моему мнению, будет зависеть многое.'
-		+'Спасибо за внимание!'
-		+'P.S. Скоро запущу стрим, приходите!',
-		undefined, undefined, 0, 0, 600 );
+		new Array('Наносит пятнадцать урона, распределенного @по вашему желанию@ между'
+		+' @любым@ числом перманентов. Это очень важно, чувак. Реально важно, понимаешь? Чуваа'
+		+'ааааак. Стой, остановись, это же ! @максемка@.' + s,
+		'это - просто охуенно, чувак!','ЛЮБЫМ! СУКА! ПРОСТО ЛЮБЫМ!', 'Максем Максемович Туртушкан - очень уважаемый бомж.'),
+		undefined, undefined, 0, 0, 200 );
 	}
 }

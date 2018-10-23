@@ -48,6 +48,9 @@ class tabs{
 				border_holder.l._x = border_holder.l.xx + border_holder.l.x_offset;
 				border_holder.r._x = border_holder.r.xx + border_holder.r.x_offset;
 			}
+			if (this.scrolling)
+				this.traceMessage('scrolling iamge');
+				
 		}
 		lastTab.onMouseUp = function (){
 			if (this.scaling){
@@ -70,6 +73,10 @@ class tabs{
 					placeTab(this);
 				}
 			}
+			if (this.scrolling){
+				
+				this.traceMessage('Scroll stop');
+			}
 			this.scaling = 0;
 			this.scrolling = 0;
 		}
@@ -85,7 +92,7 @@ class tabs{
 		lastTab.onEnterFrame = function (){
 			if (border_holder._visible && !Key.isDown(1) && (border_holder.r.onPlace && border_holder.l.onPlace))
 				border_holder._visible = false;
-			this.g.text = this.position + '  ' + this.wid;
+			this.g.text = this._name + ' : ' + this.position + '  ' + this.wid;
 			//this.dWid = this.maxWid - this.dWid;
 		}
 		lastTab.placeRight = function (){
@@ -105,8 +112,10 @@ class tabs{
 		}
 		lastTab.placeActionLayer = function (xx){
 			this.s._width =  this.sb._width * Math.min( 1,(default_width * this.wid / this.action_layer._width));
-			if (xx == undefined)
+			if (xx == undefined){
 				this.action_layer._x = (default_width * this.wid - this.action_layer._width ) * .5;
+				this.s._x = this.sb._x + ( - this.action_layer._x / this.action_layer._width)  * (this.sb._width);
+			}
 		}
 		lastTab.placeActionLayer();
 	}
