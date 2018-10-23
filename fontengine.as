@@ -8,7 +8,7 @@ class fontengine{
 	
 	static var default_separators = " \n";
 	
-	static function printIn( what, where, style, xOffset, yOffset, maxX):MovieClip{
+	static function printIn( what, where, style, xOffset, yOffset, maxX, isDescr):MovieClip{
 		
 		var isArray = (typeof(what) +'')== 'object'
 		// if it is an array, then it should be any params like descriptions!
@@ -19,6 +19,7 @@ class fontengine{
 		if (maxX == undefined) maxX = -1;
 		if (what == undefined){ trace('No string to write!!'); }
 		if (where == undefined) where = _root;
+		if (isDescr == undefined) isDescr = false;
 		
 		yOffset += letter_hei;
 		
@@ -32,6 +33,11 @@ class fontengine{
 		
 		var th = where.attachMovie('letter_handler', 'text_handler_' + where.textHandlerCount, where.getNextHighestDepth());
 		th.wordCount = 0;
+		
+		if (isDescr){
+			th.attachMovie('description_handler', 'bub', th.getNextHighestDepth());
+			curX += 5; curY += 5;
+		}
 		
 		var params;
 		if (isArray){
@@ -88,13 +94,17 @@ class fontengine{
 					if (!this.mouseOver) { this.timer = 0; if (this.printed != null){ this.printed.removeMovieClip(); this.printed = null; } return; }
 					this.timer ++;
 					if (this.timer != 41) return;
-					this.printed = printIn(this.descr, _root, this.textStyle, _root._xmouse, _root._ymouse, 100);
+					this.printed = printIn(this.descr, _root, this.textStyle, _root._xmouse, _root._ymouse, 100, true);
 				}
 				ut.colorTo(wd, 40, 100, 10);
 			}
 		}
 		where.textHandlerCount++;
 		th._xscale = th._yscale = 100;
+		if (th.bub != undefined){
+			th.bub.d._y = curY + 10.7;
+			th.bub.b._height = Math.max(0, curY - 9.9);
+		}
 		th.cacheAsBitmap = true;
 		th._x = xOffset; th._y = yOffset;
 		return th;
@@ -109,7 +119,7 @@ class fontengine{
 		new Array('Наносит пятнадцать урона, распределенного @по вашему желанию@ между'
 		+' @любым@ числом перманентов. Это очень важно, чувак. Реально важно, понимаешь? Чуваа'
 		+'ааааак. Стой, остановись, это же ! @максемка@.' + s,
-		'это - просто охуенно, чувак!','ЛЮБЫМ! СУКА! ПРОСТО ЛЮБЫМ!', 'Максем Максемович Туртушкан - очень уважаемый бомж.'),
+		'это - просто охуенно, чувак!','ЛЮБЫМ! СУКА! ПРОСТО ЛЮБЫМ!', 'Максем Максемович Туртушкан - очень уважаемый бомж. Максем Максемович Туртушкан - очень уважаемый бомж.Максем Максемович Туртушкан - очень уважаемый бомж.Максем Максемович Туртушкан - очень уважаемый бомж.Максем Максемович Туртушкан - очень уважаемый бомж.Максем Максемович Туртушкан - очень уважаемый бомж.'),
 		undefined, undefined, 0, 0, 200 );
 	}
 }

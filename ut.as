@@ -2,6 +2,11 @@
 	// constants and enums
 	
 	class ut{
+		static function FullScreen(){
+			fscommand("showmenu","false");
+			fscommand("fullscreen", "TRUE");
+		}
+	
 		static function Trace(mess){
 			trace('@   ' + mess);
 			_root.console.text += "> " + mess +"\n";
