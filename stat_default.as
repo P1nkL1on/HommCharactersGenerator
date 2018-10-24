@@ -9,12 +9,11 @@ class stat_default{
 	);
 	
 	static var statDefault = new Array(
-		new Array(new Array('name', 'имя'), 
-			new Array('жопа:широкая|пол:Ж', 'Жирная Марта'),
-			new Array('раса:гном|пол:Ж', 'Марта'),
-			new Array('раса:гном|пол:М', 'Ульрих'),
-			new Array('раса:человек|пол:Ж', 'Мари'),
-			new Array('раса:человек|пол:М', 'Вильям'),
+		new Array(new Array('name', 'имя'),
+			new Array('раса:гном|пол:ж', 'Марта'),
+			new Array('раса:гном|пол:м', 'Ульрих'),
+			new Array('раса:человек|пол:ж', 'Мари'),
+			new Array('раса:человек|пол:м', 'Вильям'),
 			new Array('', 'Безымянный')
 			),
 		new Array(new Array('lastname', 'фамилия'), 
@@ -25,10 +24,21 @@ class stat_default{
 			
 		new Array(new Array('str','strength','сил','сила'), new Array('', 8)),
 		new Array(new Array('dex','dexterity','лов','ловкость'), new Array('', 8)),
-		new Array(new Array('con','constitution','тел','телосложение'), new Array('', 8))
+		new Array(new Array('con','constitution','тел','телосложение'), new Array('', 8)),
+		
+		new Array(new Array('base HP', 'базовое ОЗ'), new Array('', stat_calculator.baseHP)),
+		new Array(new Array('max HP', 'максимальное ОЗ'), new Array('', stat_calculator.maxHP))
 	
-	);
-
+	);	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	static function findDefaultCategory(statName){
 		for (var i = 0; i < statDefaultCategory.length; ++i)
 			for (var j = 0; j < statDefaultCategory[i][1].length; ++j)
@@ -79,11 +89,19 @@ class stat_default{
 					else
 						goCopy = goCheckCondition(who, statDefault[stDefInd][caseInd][0]);// go check condition
 					if (goCopy == true){
-						for (var jj = 1; jj < statDefault[stDefInd][caseInd].length; ++jj)
-							resStatValue.push(statDefault[stDefInd][caseInd][jj]);
+						for (var jj = 1; jj < statDefault[stDefInd][caseInd].length; ++jj){
+							if (typeof(statDefault[stDefInd][caseInd][jj])+'' == 'function'){
+								resStatValue.push(statDefault[stDefInd][caseInd][jj](who));
+								ut.TraceDebug('Рассчёт параметра '+statName+' по функции.');
+							}
+							else
+								resStatValue.push(statDefault[stDefInd][caseInd][jj]);
+						}
+						
 						var newStat = stat_engine.createStat(resStatName, resStatValue);
 						newStat.category = findDefaultCategory(newStat.name);
 						ut.Trace('Дефолтное значение для "' + statName + '" становится -> ' + stat_engine.statToString(newStat));
+						
 						return newStat;
 					}						
 				}

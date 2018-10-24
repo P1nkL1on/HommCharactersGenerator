@@ -30,6 +30,7 @@
 			finName += (resLastName.length < 4)? (resLastName) : (" " + resLastName.substring(0,4)); 
 		if (finName.length > 0)
 			who.name = finName;
+		who.info = new Object;
 	}
 	
 }
