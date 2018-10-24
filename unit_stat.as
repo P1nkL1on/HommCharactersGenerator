@@ -13,15 +13,15 @@
 	// 
 	static function setName(who:Object, name:String, lastName:String, race:String, gender:String, dateBirth){
 		
-		stat_engine.addStat(who, stat_engine.createStat('ðàñà', race, 'áèîãðàôèÿ'));
-		stat_engine.addStat(who, stat_engine.createStat('ïîë', gender, 'áèîãðàôèÿ'));
-		stat_engine.addStat(who, stat_engine.createStat('ðîæäåíèå', dateBirth, 'áèîãðàôèÿ'));
+		stat_engine.addStat(who, stat_engine.createStat('раса', race, 'биография'));
+		stat_engine.addStat(who, stat_engine.createStat('пол', gender, 'биография'));
+		stat_engine.addStat(who, stat_engine.createStat('рождение', dateBirth, 'биография'));
 		
-		stat_engine.addStat(who, stat_engine.createStat('èìÿ', name, 'áèîãðàôèÿ'));
-		stat_engine.addStat(who, stat_engine.createStat('ôàìèëèÿ', lastName, 'áèîãðàôèÿ'));
+		stat_engine.addStat(who, stat_engine.createStat('имя', name, 'биография'));
+		stat_engine.addStat(who, stat_engine.createStat('фамилия', lastName, 'биография'));
 		
-		var resName = stat_engine.watchUniqueStatValueParam(who, 'èìÿ');
-		var resLastName = stat_engine.watchUniqueStatValueParam(who, 'ôàìèëèÿ');
+		var resName = stat_engine.watchUniqueStatValueParam(who, 'имя');
+		var resLastName = stat_engine.watchUniqueStatValueParam(who, 'фамилия');
 		trace(resName + '/' + resLastName);
 		var finName = "";
 		if (resName != undefined)

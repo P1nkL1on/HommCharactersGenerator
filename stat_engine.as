@@ -4,10 +4,9 @@ class stat_engine{
 	static function test(){
 		var o:Object = new Object();
 		var en:Object = new Object();
-		en.name = 'Рыца Соса';
+		en.name = 'рыца соса';
 		o.name = 'unit';
 		unit_stat.setName(o, undefined, undefined, 'человек', 'М', 25);
-		//unit_stat.setName(o, 'Тони', 'Голубов', 'человек', 'М', 25);
 		
 		A(o, 'сила', 12);
 		A(o, 'проворность', new Array(4, 5,6));
@@ -94,7 +93,7 @@ class stat_engine{
 		if (stat.name != undefined){
 			var isEmpty = (stat.value.length == 0);
 			if (isEmpty){
-				ut.TraceDebug('+ Добавлено "' + stat.name + '", но, тк значение не передано, ему будет присвоено дефолтное значение.');
+				ut.TraceDebug('+ добавлено "' + stat.name + '", но, тк значение не передано, ему будет присвоено дефолтное значение.');
 				stat = stat_default.getDefaultStat(who, stat.name);
 			}
 		}
@@ -174,9 +173,9 @@ class stat_engine{
 		if (paramNumber == undefined) 
 			paramNumber = 0;
 		if (newValue != undefined){
-			ut.TraceDebug('+ изменён стат '+who.stats[statIndex].value[paramNumber] + " -> " + newValue + '    ' + who.name+':'+  who.stats[statIndex].name + ((indexMult != undefined)? (' (' +indexMult+ ')'): ('')));
+			ut.TraceDebug('+ изменен стат '+who.stats[statIndex].value[paramNumber] + " -> " + newValue + '    ' + who.name+':'+  who.stats[statIndex].name + ((indexMult != undefined)? (' (' +indexMult+ ')'): ('')));
 			who.stats[statIndex].value[paramNumber] = newValue;
-			ut.Trace(who.name + ':'+statName + ' мянеяется. '+ "Теперь \"" +statName + "\" = "+ who.stats[statIndex].value);
+			ut.Trace(who.name + ':'+statName + ' менеяется. '+ "Теперь \"" +statName + "\" = "+ who.stats[statIndex].value);
 		}
 		return who.stats[statIndex];
 	}
@@ -186,7 +185,7 @@ class stat_engine{
 	}
 		
 	static function getStatValue(who, statName:String, indexMult):Array{
-		ut.TraceDebug('? ВЗЯТЬ значение стата "' + statName + '" у ' + who.name);
+		ut.TraceDebug('? взять значение стата "' + statName + '" у ' + who.name);
 		if (statExistWithName(who, statName))
 			return (statWithName(who, statName, indexMult)).value;
 		ut.TraceDebug('! в таком случае добавить стат "' + statName + '" с дефолтным значением для ' + who.name);
