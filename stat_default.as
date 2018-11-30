@@ -5,6 +5,10 @@ class stat_default{
 	static var statDefaultCategory = new Array(
 		new Array('биография', new Array('имя','фамилия','отец','мать','брак','рождение','раса','пол'))
 		,new Array('состояние-болезнь', new Array('рана','перелом'))
+		,new Array('стат-бой', new Array('максимальное ОЗ', 'максимальное ОМ','физ урон',
+										 'маг урон','физ защита','маг защита','уклонение','инициатива'))
+		,new Array('состояние', new Array('ОЗ', 'ОМ'))
+		
 		,new Array('стат', new Array(2,3,4))
 	);
 	
@@ -25,9 +29,21 @@ class stat_default{
 		new Array(new Array('str','strength','сил','сила'), new Array('', 8)),
 		new Array(new Array('dex','dexterity','лов','ловкость'), new Array('', 8)),
 		new Array(new Array('con','constitution','тел','телосложение'), new Array('', 8)),
+		new Array(new Array('int','intellect','инт','интеллект'), new Array('', 6)),
+		new Array(new Array('wis','wisdom','муд','мудрость'), new Array('', 6)),
+		new Array(new Array('cha','charisma','хар','харизма'), new Array('', 6)),
+		
+		new Array(new Array('IP', 'initiative points','ОИ','очки инициативы'), new Array('', 0)),
+		new Array(new Array('ini ref','initiative refill','нак иниц','накопление инициативы'), new Array('', 10)),
 		
 		new Array(new Array('base HP', 'базовое ОЗ'), new Array('', stat_calculator.baseHP)),
-		new Array(new Array('max HP', 'максимальное ОЗ'), new Array('', stat_calculator.maxHP))
+		new Array(new Array('max HP', 'максимальное ОЗ'), new Array('', stat_calculator.maxHP)),
+		new Array(new Array('HP', 'ОЗ','очки здоровья'), new Array('', stat_calculator.curHP)),
+		new Array(new Array('fdmg', 'физ урон'), 	new Array('', stat_calculator.curHP)),
+		new Array(new Array('mdmg', 'маг урон'), 	new Array('', stat_calculator.curHP)),
+		new Array(new Array('fdef', 'физ защита'), 	new Array('', stat_calculator.curHP)),
+		new Array(new Array('mdef', 'маг защита'),	new Array('', stat_calculator.curHP)),
+		new Array(new Array('ddg', 'уклонение'),	new Array('', stat_calculator.curHP))
 	
 	);	
 	
@@ -95,7 +111,10 @@ class stat_default{
 								ut.TraceDebug('Рассчёт параметра '+statName+' по функции.');
 							}
 							else
+							{
 								resStatValue.push(statDefault[stDefInd][caseInd][jj]);
+								stat_calculator.addInfo(who, statName, resStatValue + ' база'); // не вычислямое по формуле, добавляется как база
+							}
 						}
 						
 						var newStat = stat_engine.createStat(resStatName, resStatValue);

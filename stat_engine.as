@@ -71,6 +71,11 @@ class stat_engine{
 		addStat(who, newStat);
 		return newStat;
 	}
+	static function S(X):Array{
+		var res:Array = new Array();
+		res.push(X);
+		return res;	
+	}
 	
 	static function addStatHolder(who){
 		who.stats = new Array();

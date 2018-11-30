@@ -7,7 +7,20 @@ class battle_engine{
 		unit_stat.setName(o1, undefined, undefined, 'человек', 'м', 25);
 		unit_stat.setName(o2, 'Элитнэ', 'Твёрдая стрела', 'эльф', 'ж', 65);
 	
-		stat_engine.A(o1, 'максимальное ОЗ');
-		stat_engine.A(o2, 'максимальное ОЗ');
+		setMainBattleStats(o1)
+		setMainBattleStats(o2)
+		
+		trace(stat_calculator.showStat(o2, 'ОЗ'));
+	}
+	
+	static function setMainBattleStats(o:Object){
+		stat_engine.A(o, 'ОЗ');
+		stat_engine.A(o, 'ОИ');
+		
+		
+		o.hp = stat_engine.watchStatValue(o, 'ОЗ');
+		o.ap = stat_engine.watchStatValue(o, 'ОИ');
+		
+		stat_engine.listStats(o);
 	}
 }
